@@ -16,6 +16,7 @@ import MailIcon from "@mui/icons-material/Mail";
 import { Hidden } from "@mui/material";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import logo from "./../../assests/images/logo.png";
+import { useNavigate } from "react-router-dom";
 
 const drawerWidth = 230;
 
@@ -23,23 +24,28 @@ const options = [
   {
     title: "Home",
     icon: AssignmentIcon,
+    route: "",
   },
 
   {
     title: "Profile",
     icon: AssignmentIcon,
+    route: "profile",
   },
   {
     title: "Orders",
     icon: AssignmentIcon,
+    route: "orders",
   },
   {
     title: "Place-Order",
     icon: AssignmentIcon,
+    route: "new-order",
   },
 ];
 export default function PermanentDrawerLeft() {
   const [active, setActive] = useState("Home");
+  const navigate = useNavigate();
 
   return (
     <Box>
@@ -51,13 +57,12 @@ export default function PermanentDrawerLeft() {
           PaperProps={{
             sx: {
               backgroundColor: "#fbfcfb",
-              width: drawerWidth,
-              padding: "10px",
+              padding: "10px 20px",
             },
             elevation: 5,
           }}
         >
-          <Box paddingTop="1rem" paddingBottom="1rem">
+          <Box>
             {" "}
             <img
               alt={"img"}
@@ -82,6 +87,7 @@ export default function PermanentDrawerLeft() {
                 <ListItemButton
                   onClick={() => {
                     setActive(option.title);
+                    navigate(option.route);
                   }}
                   sx={{
                     flexGrow: 0,

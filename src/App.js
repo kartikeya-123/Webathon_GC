@@ -1,10 +1,13 @@
-import "./App.css";
 import Layout from "./containers/Layout";
+import { BrowserRouter } from "react-router-dom";
+import "./App.css";
 
 function App() {
   return (
-    <div className="App">
-      <Layout />
+    <div class="App">
+      <BrowserRouter>
+        <Layout />
+      </BrowserRouter>
     </div>
   );
 }
