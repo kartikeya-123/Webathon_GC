@@ -14,36 +14,9 @@ import ListItemText from "@mui/material/ListItemText";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import MailIcon from "@mui/icons-material/Mail";
 import { Hidden } from "@mui/material";
-import { makeStyles } from "@mui/styles";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import logo from "./../../assests/images/logo.png";
 
-const useStyles = makeStyles(() => ({
-  listRoot: {
-    marginTop: "2rem",
-    height: "100%",
-    display: "flex",
-    flexDirection: "column",
-    gap: "10px",
-  },
-  listItemRoot: {
-    display: "flex",
-    fontSize: ".9rem",
-    color: "red",
-    padding: ".65rem 1.5rem !important",
-    "&:hover": {
-      color: "blue",
-    },
-    paper: {
-      background: "blue",
-    },
-  },
-  logoClasses: {
-    width: "200px",
-    height: "130px",
-    borderRadius: "100%",
-  },
-}));
 const drawerWidth = 230;
 
 const options = [
@@ -66,7 +39,6 @@ const options = [
   },
 ];
 export default function PermanentDrawerLeft() {
-  const classes = useStyles();
   const [active, setActive] = useState("Home");
 
   return (
@@ -87,9 +59,21 @@ export default function PermanentDrawerLeft() {
         >
           <Box paddingTop="1rem" paddingBottom="1rem">
             {" "}
-            <img alt={"img"} className={classes.logoClasses} src={logo} />
+            <img
+              alt={"img"}
+              style={{ width: "200px", height: "130px", borderRadius: "100%" }}
+              src={logo}
+            />
           </Box>
-          <List classes={{ root: classes.listRoot }}>
+          <List
+            style={{
+              marginTop: "2rem",
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+              gap: "10px",
+            }}
+          >
             {options.map((option) => {
               let tabActive = false;
               if (active === option.title) tabActive = true;
