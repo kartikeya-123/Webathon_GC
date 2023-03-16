@@ -9,7 +9,6 @@ const Layout = () => {
     <div
       style={{
         display: "flex",
-        flexDirection: "flex-start",
         width: "100%",
         height: "100vh",
       }}
@@ -19,7 +18,8 @@ const Layout = () => {
       <div
         style={{
           flexGrow: 1,
-          background: "red",
+          marginLeft: "240px",
+          backgroundColor: "#f2f0f0",
         }}
       >
         <Routes>

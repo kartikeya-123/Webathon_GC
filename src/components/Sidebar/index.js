@@ -57,9 +57,10 @@ export default function PermanentDrawerLeft() {
           PaperProps={{
             sx: {
               backgroundColor: "#fbfcfb",
-              padding: "10px 20px",
+              padding: "10px 10px",
+              width: drawerWidth,
             },
-            elevation: 5,
+            elevation: 10,
           }}
         >
           <Box>
