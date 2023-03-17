@@ -6,6 +6,8 @@ import NewOrder from "../NewOrder";
 import { Box } from "@mui/material";
 import { UserAuth } from "../../context";
 import Signin from "../../components/Login";
+import TopBar from "../../components/TopBar";
+
 const Layout = () => {
   const { user } = UserAuth();
 
@@ -25,16 +27,27 @@ const Layout = () => {
       {user && (
         <>
           <Sidebar />
+
           <div
             style={{
-              flexGrow: 1,
+              display: "flex",
+              flexDirection: "column",
               marginLeft: "240px",
-              backgroundColor: "#f2f0f0",
+              width: "100%",
             }}
           >
-            <Routes>
-              <Route path="/new-order" element={<NewOrder user={user} />} />
-            </Routes>
+            <TopBar user={user} />
+            <div
+              style={{
+                flexGrow: 1,
+
+                backgroundColor: "#f2f0f0",
+              }}
+            >
+              <Routes>
+                <Route path="/new-order" element={<NewOrder user={user} />} />
+              </Routes>
+            </div>
           </div>
         </>
       )}

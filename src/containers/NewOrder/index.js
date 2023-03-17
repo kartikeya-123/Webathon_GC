@@ -39,7 +39,7 @@ const NewOrder = ({ user }) => {
   const [weight, setWeight] = useState(null);
   const [active, setActive] = useState(0);
 
-  const [show, setShow] = useState(true);
+  const [show, setShow] = useState(false);
   const [showMessage, setShowMessage] = useState(0);
 
   const { isLoaded } = useJsApiLoader({
@@ -169,8 +169,8 @@ const NewOrder = ({ user }) => {
     );
   };
   return (
-    <Box sx={{ width: "100%", height: "100vh" }}>
-      <Box sx={{ width: "100%", height: "100vh" }}>
+    <Box sx={{ width: "100%", height: "100%" }}>
+      <Box sx={{ width: "100%", height: "100%" }}>
         <GoogleMap
           center={center}
           zoom={10}
