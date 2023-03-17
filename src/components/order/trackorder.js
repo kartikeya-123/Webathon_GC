@@ -11,8 +11,23 @@ import {
   InfoBox,
   InfoWindow,
 } from "@react-google-maps/api";
+import {
+  collection,
+  setDoc,
+  doc,
+  getDocs,
+  updateDoc,
+  onSnapshot,
+} from "firebase/firestore";
 
-const TrackOrder = ({ setroute, setdata, setorderdelivered }) => {
+import { db } from "../../config";
+
+const TrackOrder = ({
+  setroute,
+  setdata,
+  setorderdelivered,
+  selectedOrder,
+}) => {
   const origin = { lat: 6.5244, lng: 3.3792 };
 
   const [Path, setpath] = useState(null);
@@ -20,15 +35,14 @@ const TrackOrder = ({ setroute, setdata, setorderdelivered }) => {
   const [dire, setd] = useState(null);
   const [post, setpos] = useState(null);
   const [index, setindex] = useState(40);
-  const [open, isopen] = useState(false);
+  const [open, isopen] = useState(true);
+
+  const [droneLocation, setDroneLocation] = useState(null);
+
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: "AIzaSyAm8wWzqS9Rltn5WvhUGqGZPeJsmJkykNU",
     libraries: ["places"],
   });
-
-  if (!isLoaded) {
-    return <></>;
-  }
 
   const Move = (g) => {
     var x = [];
@@ -50,38 +64,40 @@ const TrackOrder = ({ setroute, setdata, setorderdelivered }) => {
     }, 1000);
   };
 
-  const get = () => {
-    const directionsService = new window.google.maps.DirectionsService();
-    directionsService.route(
-      {
-        origin: origin,
-        destination: destination,
+  const get = async () => {
+    try {
+      const directionsService = new window.google.maps.DirectionsService();
+      const response = await directionsService.route({
+        origin: selectedOrder.from,
+        destination: selectedOrder.to,
         travelMode: window.google.maps.TravelMode.DRIVING,
-      },
-      (result, status) => {
-        if (status === window.google.maps.DirectionsStatus.OK) {
-          setd(result);
-          setdata({
-            distance: result.routes[0].legs[0].distance.text,
-            time: result.routes[0].legs[0].duration.text,
-            from: origin,
-            to: destination,
-          });
-          var z = result.routes[0].legs[0].steps;
+      });
 
-          if (z.length > 5) {
-            var d = [z[0], z[1], z[2], z[z.length - 2], z[z.length - 1]];
-            setroute(d);
-          } else {
-            setroute(z);
-          }
-          Move(result.routes[0].overview_path);
-        } else {
-          console.error(`error fetching directions ${result}`);
-        }
-      }
-    );
+      setd(response);
+    } catch (err) {
+      console.log(err);
+    }
   };
+
+  const getDrone = () => {
+    const droneId = selectedOrder.droneId;
+    if (!droneId) return;
+
+    const droneRef = doc(db, "Drones", droneId);
+
+    onSnapshot(droneRef, (snapshot) => {
+      const droneData = snapshot.data();
+      setDroneLocation(droneData.location);
+    });
+  };
+  useEffect(() => {
+    get();
+    getDrone();
+  }, [selectedOrder]);
+
+  if (!isLoaded) {
+    return <></>;
+  }
   return (
     <div
       style={{
@@ -99,12 +115,12 @@ const TrackOrder = ({ setroute, setdata, setorderdelivered }) => {
         zoom={10}
         mapContainerStyle={{ width: "95%", height: "30vh" }}
       >
-        {post !== null && (
+        {droneLocation !== null && (
           <Marker
-            onClick={(e) => isopen(true)}
-            position={{ lat: post[0], lng: post[1] }}
+            // onClick={(e) => isopen(true)}
+            position={droneLocation}
           >
-            {open === true && (
+            {/* {open === true && (
               <InfoWindow>
                 <div>
                   <img
@@ -114,7 +130,7 @@ const TrackOrder = ({ setroute, setdata, setorderdelivered }) => {
                   ></img>
                 </div>
               </InfoWindow>
-            )}
+            )} */}
           </Marker>
         )}
 

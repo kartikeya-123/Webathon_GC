@@ -14,18 +14,32 @@ import TrackOrder from "./trackorder";
 import HomeIcon from "@mui/icons-material/Home";
 import React, { useEffect, useState } from "react";
 import PersonIcon from "@mui/icons-material/Person";
-import { Button, Modal, Typography, Card, Avatar } from "@mui/material";
+import { Button, Modal, Typography, Card, Avatar, Chip } from "@mui/material";
 import Geocode from "react-geocode";
+import {
+  collection,
+  setDoc,
+  doc,
+  getDocs,
+  updateDoc,
+  onSnapshot,
+} from "firebase/firestore";
+import { db } from "../../config";
+
 Geocode.setApiKey("AIzaSyAm8wWzqS9Rltn5WvhUGqGZPeJsmJkykNU");
 Geocode.setLanguage("en");
 
-const Order = () => {
+const Order = ({ user }) => {
   const [value, setValue] = useState(1);
   const [open, setopen] = useState(false);
+
+  const [orderData, setOrderData] = useState(null);
+
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
   const [activeStep, setActiveStep] = React.useState(3);
+  const [selectedOrder, setSelectedOrder] = React.useState(null);
   const [route, setroute] = useState(null);
   const x = 1;
 
@@ -43,6 +57,7 @@ const Order = () => {
   });
 
   const [add, setadd] = useState();
+
   const getAddress = async (coordinates) => {
     var response = await Geocode.fromLatLng(coordinates.lat, coordinates.lng);
     setroutes([...routes, response.results[0].formatted_address]);
@@ -61,6 +76,22 @@ const Order = () => {
       });
     }
   };
+
+  const getAllOrders = async () => {
+    console.log(user.email);
+    onSnapshot(collection(db, "Orders"), (snapshot) => {
+      const documents = [];
+      snapshot.forEach((doc) => {
+        const orderData = doc.data();
+        if (orderData.userId === user.email) {
+          documents.push({ orderId: doc.id, ...orderData });
+        }
+      });
+      console.log(documents);
+      setOrderData(documents);
+    });
+  };
+
   useEffect(() => {
     if (route === null) {
       return;
@@ -68,36 +99,12 @@ const Order = () => {
     get_routes();
   }, [route]);
 
-  const [order, setorder] = useState([
-    {
-      "ORDER PLACED": "6 March 2023",
-      "TOTAL:": "1,999.00",
-      "Delivered ": "10-Mar-2023",
-      status: "in delivary",
-      id: " #407-2510492-0729917",
-      path: {
-        from: "1park avenue",
-        to: "stree avenue",
-      },
-    },
-    {
-      "ORDER PLACED": "6 March 2023",
-      "TOTAL:": "1,999.00",
-      "Delivered ": "10-Mar-2023",
-      status: "delivaerd",
-      id: "# 407-2510492-0729917",
-    },
-    {
-      "ORDER PLACED": "6 March 2023",
-      "TOTAL:": "1,999.00",
-      "Delivered ": "10-Mar-2023",
-      status: "in delivary",
-      id: "# 407-2510492-0729917",
-    },
-  ]);
+  useEffect(() => {
+    getAllOrders();
+  }, []);
 
   return (
-    <Box sx={{ marginLeft: "100px", padding: "20px" }}>
+    <Box sx={{ padding: "20px 40px" }}>
       <TabContext value={value}>
         <Box>
           <TabList onChange={handleChange} aria-label="lab API tabs example">
@@ -139,7 +146,7 @@ const Order = () => {
                 <div
                   style={{
                     width: "100%",
-               
+
                     padding: "20px",
                     display: "flex",
                     flexDirection: "column",
@@ -211,113 +218,138 @@ const Order = () => {
                     </div>
                   </div>
                 </div>
-                <div   style={{width:"100%",display:"flex",flexDirection:"column",overflowX:"hidden"
-            }}
-   
-           
-           >
-            {console.log(document.getElementById("data"))}
-           {[1,2,3,4].map(()=>     <Box
-                  sx={{
+                <div
+                  style={{
                     width: "100%",
-                    // height: "30%",
-                    backgroundColor: "white",
                     display: "flex",
                     flexDirection: "column",
-                    padding: "20px 0px",
-                    gap: "20px",
-                    border:"1px solid #D5D9D9",
-                   ':hover':{
-                    backgroundColor:"lightgray"
-                   } 
-
+                    overflowX: "hidden",
                   }}
                 >
-                  <div
-                    style={{
-                      marginLeft: "10px",
-                      display: "flex",
-                      flexDirection: "row",
-                      gap: "20px",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Avatar
-                      sx={{
-                        width: "50px",
-                        height: "50px",
-                        backgroundColor: "#362FD9",
-                      }}
-                    >
-                      <svg
-                        style={{ fill: "white" }}
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
+                  {console.log(document.getElementById("data"))}
+                  {orderData &&
+                    orderData.map((orderItem, ind) => (
+                      <Box
+                        sx={{
+                          width: "100%",
+                          // height: "30%",
+                          backgroundColor: "white",
+                          display: "flex",
+                          flexDirection: "column",
+                          padding: "20px 0px",
+                          gap: "20px",
+                          border: "1px solid #D5D9D9",
+                          ":hover": {
+                            backgroundColor: "lightgray",
+                          },
+                        }}
+                        key={ind}
+                        onClick={() => {
+                          console.log("e");
+                          setSelectedOrder(orderItem);
+                        }}
                       >
-                        <path d="M19.15 8a2 2 0 0 0-1.72-1H15V5a1 1 0 0 0-1-1H4a2 2 0 0 0-2 2v10a2 2 0 0 0 1 1.73 3.49 3.49 0 0 0 7 .27h3.1a3.48 3.48 0 0 0 6.9 0 2 2 0 0 0 2-2v-3a1.07 1.07 0 0 0-.14-.52zM15 9h2.43l1.8 3H15zM6.5 19A1.5 1.5 0 1 1 8 17.5 1.5 1.5 0 0 1 6.5 19zm10 0a1.5 1.5 0 1 1 1.5-1.5 1.5 1.5 0 0 1-1.5 1.5z"></path>
-                      </svg>
-                    </Avatar>
-                    <div>
-                      <Typography>TO Milden warren</Typography>
-                      <Typography sx={{ color: "blue", fontSize: "10px" }}>
-                        Delivered
-                      </Typography>
-                    </div>
-                  </div>
-                  <div
-                    style={{
-                      marginLeft: "10px",
-                      display: "flex",
-                      flexDirection: "row",
-                      gap: "20px",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Avatar
-                      sx={{
-                        width: "50px",
-                        height: "50px",
-                        backgroundColor: "white",
-                      }}
-                    >
-<svg xmlns="http://www.w3.org/2000/svg" height="24" width="24"><path d="M12 17q2.075 0 3.538-1.463Q17 14.075 17 12t-1.462-3.538Q14.075 7 12 7 9.925 7 8.463 8.462 7 9.925 7 12q0 2.075 1.463 3.537Q9.925 17 12 17Zm0 5q-2.075 0-3.9-.788-1.825-.787-3.175-2.137-1.35-1.35-2.137-3.175Q2 14.075 2 12t.788-3.9q.787-1.825 2.137-3.175 1.35-1.35 3.175-2.138Q9.925 2 12 2t3.9.787q1.825.788 3.175 2.138 1.35 1.35 2.137 3.175Q22 9.925 22 12t-.788 3.9q-.787 1.825-2.137 3.175-1.35 1.35-3.175 2.137Q14.075 22 12 22Zm0-2q3.35 0 5.675-2.325Q20 15.35 20 12q0-3.35-2.325-5.675Q15.35 4 12 4 8.65 4 6.325 6.325 4 8.65 4 12q0 3.35 2.325 5.675Q8.65 20 12 20Zm0-8Z"/></svg>
-                    </Avatar>
-                    <div>
-                      <Typography>PICK UP</Typography>
-                      <Typography sx={{ color: "blue", fontSize: "10px" }}>
-                        7 Unity Cres, Akesan Igando 101245
-                      </Typography>
-                    </div>
-                  </div>
-                  <div
-                    style={{
-                      marginLeft: "10px",
-                      display: "flex",
-                      flexDirection: "row",
-                      gap: "20px",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Avatar
-                      sx={{
-                        width: "50px",
-                        height: "50px",
-                        backgroundColor: "white",
-                      }}
-                    >
-<svg xmlns="http://www.w3.org/2000/svg" height="24" width="24"><path d="M12 12q.825 0 1.413-.588Q14 10.825 14 10t-.587-1.413Q12.825 8 12 8q-.825 0-1.412.587Q10 9.175 10 10q0 .825.588 1.412Q11.175 12 12 12Zm0 7.35q3.05-2.8 4.525-5.088Q18 11.975 18 10.2q0-2.725-1.738-4.463Q14.525 4 12 4 9.475 4 7.737 5.737 6 7.475 6 10.2q0 1.775 1.475 4.062Q8.95 16.55 12 19.35ZM12 22q-4.025-3.425-6.012-6.363Q4 12.7 4 10.2q0-3.75 2.413-5.975Q8.825 2 12 2t5.587 2.225Q20 6.45 20 10.2q0 2.5-1.987 5.437Q16.025 18.575 12 22Zm0-11.8Z"/></svg>
-                    </Avatar>
-                    <div>
-                      <Typography>Arrival</Typography>
-                      <Typography sx={{ color: "blue", fontSize: "10px" }}>
-                        FC8X+MX9, Banana Island 106104
-                      </Typography>
-                    </div>
-                  </div>
-                </Box>)}
-                
+                        <div
+                          style={{
+                            marginLeft: "10px",
+                            display: "flex",
+                            flexDirection: "row",
+                            gap: "20px",
+                            alignItems: "center",
+                          }}
+                        >
+                          <Avatar
+                            sx={{
+                              width: "50px",
+                              height: "50px",
+                              backgroundColor: "white",
+                            }}
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              height="24"
+                              width="24"
+                            >
+                              <path d="M12 17q2.075 0 3.538-1.463Q17 14.075 17 12t-1.462-3.538Q14.075 7 12 7 9.925 7 8.463 8.462 7 9.925 7 12q0 2.075 1.463 3.537Q9.925 17 12 17Zm0 5q-2.075 0-3.9-.788-1.825-.787-3.175-2.137-1.35-1.35-2.137-3.175Q2 14.075 2 12t.788-3.9q.787-1.825 2.137-3.175 1.35-1.35 3.175-2.138Q9.925 2 12 2t3.9.787q1.825.788 3.175 2.138 1.35 1.35 2.137 3.175Q22 9.925 22 12t-.788 3.9q-.787 1.825-2.137 3.175-1.35 1.35-3.175 2.137Q14.075 22 12 22Zm0-2q3.35 0 5.675-2.325Q20 15.35 20 12q0-3.35-2.325-5.675Q15.35 4 12 4 8.65 4 6.325 6.325 4 8.65 4 12q0 3.35 2.325 5.675Q8.65 20 12 20Zm0-8Z" />
+                            </svg>
+                          </Avatar>
+                          <div>
+                            <Typography>{orderItem.toAddress}</Typography>
+                            <Typography
+                              sx={{ color: "blue", fontSize: "10px" }}
+                            >
+                              Delivery
+                            </Typography>
+                          </div>
+                        </div>
+                        <div
+                          style={{
+                            marginLeft: "10px",
+                            display: "flex",
+                            flexDirection: "row",
+                            gap: "20px",
+                            alignItems: "center",
+                          }}
+                        >
+                          <Avatar
+                            sx={{
+                              width: "50px",
+                              height: "50px",
+                              backgroundColor: "white",
+                            }}
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              height="24"
+                              width="24"
+                            >
+                              <path d="M12 17q2.075 0 3.538-1.463Q17 14.075 17 12t-1.462-3.538Q14.075 7 12 7 9.925 7 8.463 8.462 7 9.925 7 12q0 2.075 1.463 3.537Q9.925 17 12 17Zm0 5q-2.075 0-3.9-.788-1.825-.787-3.175-2.137-1.35-1.35-2.137-3.175Q2 14.075 2 12t.788-3.9q.787-1.825 2.137-3.175 1.35-1.35 3.175-2.138Q9.925 2 12 2t3.9.787q1.825.788 3.175 2.138 1.35 1.35 2.137 3.175Q22 9.925 22 12t-.788 3.9q-.787 1.825-2.137 3.175-1.35 1.35-3.175 2.137Q14.075 22 12 22Zm0-2q3.35 0 5.675-2.325Q20 15.35 20 12q0-3.35-2.325-5.675Q15.35 4 12 4 8.65 4 6.325 6.325 4 8.65 4 12q0 3.35 2.325 5.675Q8.65 20 12 20Zm0-8Z" />
+                            </svg>
+                          </Avatar>
+                          <div>
+                            <Typography>{orderItem.fromAddress}</Typography>
+                            <Typography
+                              sx={{ color: "blue", fontSize: "10px" }}
+                            >
+                              Pick up
+                            </Typography>
+                          </div>
+                        </div>
+                        <div
+                          style={{
+                            marginLeft: "10px",
+                            display: "flex",
+                            flexDirection: "row",
+                            gap: "20px",
+                            alignItems: "center",
+                          }}
+                        >
+                          <Avatar
+                            sx={{
+                              width: "50px",
+                              height: "50px",
+                              backgroundColor: "white",
+                            }}
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              height="24"
+                              width="24"
+                            >
+                              <path d="M12 12q.825 0 1.413-.588Q14 10.825 14 10t-.587-1.413Q12.825 8 12 8q-.825 0-1.412.587Q10 9.175 10 10q0 .825.588 1.412Q11.175 12 12 12Zm0 7.35q3.05-2.8 4.525-5.088Q18 11.975 18 10.2q0-2.725-1.738-4.463Q14.525 4 12 4 9.475 4 7.737 5.737 6 7.475 6 10.2q0 1.775 1.475 4.062Q8.95 16.55 12 19.35ZM12 22q-4.025-3.425-6.012-6.363Q4 12.7 4 10.2q0-3.75 2.413-5.975Q8.825 2 12 2t5.587 2.225Q20 6.45 20 10.2q0 2.5-1.987 5.437Q16.025 18.575 12 22Zm0-11.8Z" />
+                            </svg>
+                          </Avatar>
+                          <div>
+                            <Typography>Arrival</Typography>
+                            <Typography
+                              sx={{ color: "blue", fontSize: "10px" }}
+                            >
+                              FC8X+MX9, Banana Island 106104
+                            </Typography>
+                          </div>
+                        </div>
+                      </Box>
+                    ))}
                 </div>
               </div>
               <div
@@ -570,6 +602,7 @@ const Order = () => {
                   setdata={setdata}
                   setroute={setroute}
                   setorderdelivered={setorderdelivered}
+                  selectedOrder={selectedOrder}
                 ></TrackOrder>
                 <br></br>
                 <div style={{ width: "95%", paddingLeft: "20px" }}>
@@ -780,42 +813,155 @@ const Order = () => {
               </div>
             </div>
           </Modal>
-          <TableContainer component={Paper}>
+          <TableContainer
+            component={Paper}
+            style={{
+              boxShadow: "rgba(100, 100, 111, 0.2) 0px 7px 29px 0px",
+              borderRadius: "10px",
+            }}
+          >
             <Table>
               <TableHead>
-                <TableRow>
-                  <TableCell>Order ID</TableCell>
-                  <TableCell>Delivery Date</TableCell>
-                  <TableCell>TOTAL</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell>Track</TableCell>
+                <TableRow sx={{ padding: "20px", background: "#F7F9FC" }}>
+                  <TableCell
+                    sx={{
+                      padding: "20px",
+                      fontSize: "18px",
+                      fontWeight: "bold",
+                      color: "#435971",
+                    }}
+                    align="left"
+                  >
+                    Order ID
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      fontSize: "18px",
+                      fontWeight: "bold",
+                      color: "#435971",
+                    }}
+                    align="left"
+                  >
+                    Delivery Date
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      fontSize: "18px",
+                      fontWeight: "bold",
+                      color: "#435971",
+                    }}
+                    align="left"
+                  >
+                    TOTAL
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      fontSize: "18px",
+                      fontWeight: "bold",
+                      color: "#435971",
+                    }}
+                    align="left"
+                  >
+                    Status
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      fontSize: "18px",
+                      fontWeight: "bold",
+                      color: "#435971",
+                    }}
+                    align="left"
+                  >
+                    Track
+                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {order.map((row) => (
-                  <TableRow
-                    hover={true}
-                    key={row["ORDER PLACED"] + row["id"]}
-                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                  >
-                    <TableCell>{row.id}</TableCell>
-
-                    <TableCell>{row["ORDER PLACED"]}</TableCell>
-                    <TableCell>{row["TOTAL:"]}</TableCell>
-
-                    <TableCell>{row.status}</TableCell>
-
-                    <TableCell>
-                      <Button
-                        disabled={row.status === "delivaerd" ? true : false}
-                        variant="contained"
-                        onClick={() => setopen(true)}
+                {orderData &&
+                  orderData.map((row, ind) => (
+                    <TableRow
+                      hover={true}
+                      key={ind}
+                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                    >
+                      <TableCell
+                        sx={{
+                          padding: "20px",
+                          color: "#364A61",
+                          fontSize: "17px",
+                          fontWeight: 550,
+                        }}
                       >
-                        Track
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                        {row.orderId}
+                      </TableCell>
+
+                      <TableCell
+                        sx={{
+                          padding: "20px",
+                          color: "#364A61",
+                          fontSize: "17px",
+                          fontWeight: 550,
+                        }}
+                      >
+                        {row["ORDER PLACED"]}
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          padding: "20px",
+                          color: "#364A61",
+                          fontSize: "17px",
+                          fontWeight: 550,
+                        }}
+                      >
+                        {row.items}
+                      </TableCell>
+
+                      <TableCell
+                        sx={{
+                          padding: "20px",
+                          color: "#364A61",
+                          fontSize: "17px",
+                          fontWeight: 550,
+                        }}
+                      >
+                        <Chip
+                          label={row.status}
+                          variant="contained"
+                          sx={{
+                            background:
+                              row.status === "Active" ? "#ACE60C" : "#07a0ad",
+                            color:
+                              row.status === "Active" ? "#523B10" : "#faffe8",
+                            fontSize: "17px",
+                            fontWeight: 550,
+                            width: "100px",
+                            borderRadius: "10px",
+                          }}
+                        />
+                      </TableCell>
+
+                      <TableCell
+                        sx={{
+                          padding: "20px",
+                          color: "#364A61",
+                          fontSize: "17px",
+                          fontWeight: 550,
+                        }}
+                      >
+                        <Button
+                          // disabled={row.status === "Active" ? false : true}
+                          variant="contained"
+                          onClick={() => {
+                            setSelectedOrder(row);
+                            setopen(true);
+                          }}
+                          sx={{ borderRadius: "10px" }}
+                        >
+                          Track
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
               </TableBody>
             </Table>
           </TableContainer>

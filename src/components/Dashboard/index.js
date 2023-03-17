@@ -20,6 +20,7 @@ import {
   Autocomplete,
   Marker,
   Polyline,
+  DirectionsRenderer,
 } from "@react-google-maps/api";
 import { styled } from "@mui/material/styles";
 import LocalAirportIcon from "@mui/icons-material/LocalAirport";
@@ -101,6 +102,7 @@ const Dashboard = () => {
   const [markers, setMarkers] = useState(null);
   const [showMessage, setShowMessage] = useState(0);
   const [drones, setDrones] = useState(null);
+  const [directions, setDirections] = useState(null);
 
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: "AIzaSyAm8wWzqS9Rltn5WvhUGqGZPeJsmJkykNU",
@@ -131,9 +133,70 @@ const Dashboard = () => {
       console.log(marks);
       setMarkers(marks);
       setOrderData(data);
+      getPath(data[0]);
     });
   };
 
+  const getPath = async (activeOrders) => {
+    try {
+      const directionResponses = [];
+
+      for (let i = 0; i < activeOrders.length; i++) {
+        const directionsService = new window.google.maps.DirectionsService();
+        const response = await directionsService.route({
+          origin: activeOrders[i].from,
+          destination: activeOrders[i].to,
+          travelMode: window.google.maps.TravelMode.DRIVING,
+        });
+
+        directionResponses.push(response);
+        const path = response.routes[0].overview_path;
+
+        // if (activeOrders[i].droneId)
+        //   simulateDrones(activeOrders[i].droneId, path);
+      }
+      setDirections(directionResponses);
+
+      for (let i = 0; i < activeOrders.length; i++) {
+        if (activeOrders[i].droneId) {
+          console.log("ddef");
+          simulateDrones(
+            activeOrders[i].orderId,
+            activeOrders[i].droneId,
+            directionResponses[i].routes[0].overview_path
+          );
+        }
+      }
+    } catch (err) {}
+  };
+
+  const simulateDrones = (orderId, droneId, path) => {
+    console.log(typeof droneId);
+    const droneRef = doc(db, "Drones", droneId);
+    const orderRef = doc(db, "Orders", orderId);
+    console.log("nex");
+
+    let start = 0;
+    let end = path.length - 1;
+
+    const interval = setInterval(async () => {
+      try {
+        const droneLocation = {
+          lat: path[start].lat(),
+          lng: path[start].lng(),
+        };
+        await updateDoc(droneRef, { location: droneLocation });
+        start = start + 1;
+        if (start >= end) {
+          await updateDoc(orderRef, { status: "Finished" });
+          await updateDoc(droneRef, { status: "Free", order: null });
+          clearInterval(interval);
+        }
+      } catch (err) {
+        clearInterval(interval);
+      }
+    }, [1000]);
+  };
   const getDrones = () => {
     onSnapshot(collection(db, "Drones"), (snapshot) => {
       const documents = [];
@@ -170,7 +233,7 @@ const Dashboard = () => {
           console.log(err);
         });
 
-      updateDoc(droneRef, { status: "Active", order })
+      updateDoc(droneRef, { status: "Active", order, location: order.from })
         .then((res) => {
           console.log(res);
         })
@@ -217,7 +280,7 @@ const Dashboard = () => {
 
       <Box sx={{ height: "340px", borderRadius: "40px" }}>
         <GoogleMap
-          center={center}
+          defaultCenter={center}
           zoom={10}
           mapContainerStyle={{
             width: "100%",
@@ -229,20 +292,14 @@ const Dashboard = () => {
             zoomControl: false,
           }}
         >
-          {markers &&
-            markers.map((marker, ind) => {
-              return (
-                <>
-                  <Marker position={marker[0]} />
-                  <Marker position={marker[1]} />
-                  <Polyline
-                    path={marker}
-                    strokeColor="#0000FF"
-                    strokeOpacity={0.8}
-                    strokeWeight={2}
-                  />
-                </>
-              );
+          {drones &&
+            drones.map((drone, ind) => {
+              if (drone.status !== "Active") return;
+              return <Marker position={drone.location} key={ind} />;
+            })}
+          {directions &&
+            directions.map((direction, ind) => {
+              return <DirectionsRenderer directions={direction} key={ind} />;
             })}
         </GoogleMap>
       </Box>

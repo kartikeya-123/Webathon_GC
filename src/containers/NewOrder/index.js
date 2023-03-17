@@ -136,7 +136,7 @@ const NewOrder = ({ user }) => {
     try {
       const order = await setDoc(orderRef, data);
 
-      let orders = user.orders;
+      let orders = user.orders || [];
       orders.push(orderId);
 
       const userRef = doc(db, "Users", user.email);
