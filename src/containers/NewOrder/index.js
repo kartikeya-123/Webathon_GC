@@ -31,7 +31,6 @@ const NewOrder = ({ user }) => {
   // Variables
   const [fromAddress, setFromAddress] = useState("");
   const [toAddress, setToAddress] = useState("");
-
   const [fromLatLong, setFromLatLong] = useState(null);
   const [toLatLong, setToLatLong] = useState(null);
 
@@ -49,11 +48,11 @@ const NewOrder = ({ user }) => {
 
   Geocode.setApiKey("AIzaSyAm8wWzqS9Rltn5WvhUGqGZPeJsmJkykNU");
   Geocode.setLanguage("en");
-
+  
   if (!isLoaded) {
     return <div>Loading</div>;
   }
-
+  
   const center = { lat: 20.1469136, lng: 85.6727937 };
 
   const userSelect = (res) => {
@@ -177,7 +176,8 @@ const NewOrder = ({ user }) => {
     );
   };
   return (
-    <Box sx={{ width: "100%", height: "100%" }}>
+<>
+  <Box sx={{ width: "100%", height: "100%" }}>
       <Box sx={{ width: "100%", height: "100%" }}>
         <GoogleMap
           center={center}
@@ -340,6 +340,8 @@ const NewOrder = ({ user }) => {
         )}
       </Box>
     </Box>
+
+    </>
   );
 };
 
