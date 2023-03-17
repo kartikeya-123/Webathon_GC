@@ -34,7 +34,7 @@ const NewOrder = () => {
       x.push([g[i].lat(), g[i].lng()]);
     }
     setpath(x);
-    console.log(x);
+
     var y = 0;
     const z = setInterval(() => {
       if (y >= x.length) {
@@ -58,7 +58,7 @@ const NewOrder = () => {
       (result, status) => {
         if (status === google.maps.DirectionsStatus.OK) {
           setd(result);
-
+          console.log(res)
           Move(result.routes[0].overview_path);
         } else {
           console.error(`error fetching directions ${result}`);
@@ -67,14 +67,14 @@ const NewOrder = () => {
     );
   };
   return (
-    <div style={{ marginLeft: "100px" }}>
+    <div style={{width:"100%",height:"100%"}}>
       <GoogleMap
         onLoad={() => {
           get();
         }}
         defaultCenter={{ lat: 6.5244, lng: 3.3792 }}
         zoom={10}
-        mapContainerStyle={{ width: "1200px", height: "600px" }}
+        mapContainerStyle={{ width: "100%", height: "600px" }}
       >
         {post !== null && (
           <Marker
