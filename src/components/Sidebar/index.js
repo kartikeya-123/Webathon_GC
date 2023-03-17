@@ -37,11 +37,7 @@ const options = [
     icon: AssignmentIcon,
     route: "new-order",
   },
-  {
-    title: "Track",
-    icon: AssignmentIcon,
-    route: "track",
-  },
+
   {
     title: "Dashboard",
     icon: AssignmentIcon,

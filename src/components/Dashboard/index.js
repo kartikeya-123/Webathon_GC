@@ -100,6 +100,7 @@ const Dashboard = () => {
   const [orderData, setOrderData] = useState(null);
   const [markers, setMarkers] = useState(null);
   const [showMessage, setShowMessage] = useState(0);
+  const [drones, setDrones] = useState(null);
 
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: "AIzaSyAm8wWzqS9Rltn5WvhUGqGZPeJsmJkykNU",
@@ -109,28 +110,6 @@ const Dashboard = () => {
   const center = { lat: 20.1469136, lng: 85.6727937 };
 
   const getAllOrders = async () => {
-    // const snapshot = await getDocs(collection(db, "Orders"));
-    // const documents = [];
-    // snapshot.forEach((doc) => {
-    //   documents.push({ orderId: doc.id, ...doc.data() });
-    // });
-
-    // let data = [[], [], []];
-    // let marks = [];
-
-    // documents.forEach((doc) => {
-    //   doc.fromAddress = doc.fromAddress.split(",").slice(-3, -1).join(",");
-    //   doc.toAddress = doc.toAddress.split(",").slice(-3, -1).join(",");
-    //   if (doc.status === "Active") {
-    //     data[0].push(doc);
-    //     marks.push([doc.from, doc.to]);
-    //   } else if (doc.status === "Pending") data[1].push(doc);
-    //   else data[2].push(doc);
-    // });
-    // console.log(marks);
-    // setMarkers(marks);
-    // setOrderData(data);
-
     onSnapshot(collection(db, "Orders"), (snapshot) => {
       const documents = [];
       snapshot.forEach((doc) => {
@@ -155,29 +134,58 @@ const Dashboard = () => {
     });
   };
 
+  const getDrones = () => {
+    onSnapshot(collection(db, "Drones"), (snapshot) => {
+      const documents = [];
+      snapshot.forEach((doc) => {
+        documents.push(doc.data());
+      });
+      console.log(documents);
+      setDrones(documents);
+    });
+  };
+
   useEffect(() => {
     getAllOrders();
+    getDrones();
   }, []);
 
-  const acceptShipment = (orderId) => {
-    const docRef = doc(db, "Orders", orderId);
+  const acceptShipment = (order) => {
+    const freeDrones = drones.filter((drone) => {
+      return drone.status === "Free";
+    });
+    if (freeDrones.length > 0) {
+      const selectedDrone = freeDrones[0];
 
-    updateDoc(docRef, { status: "Active" })
-      .then((res) => {
-        console.log(res);
-        setShowMessage(1);
-      })
-      .catch((err) => {
-        setShowMessage(-1);
-        console.log(err);
-      });
+      const docRef = doc(db, "Orders", order.orderId);
+      const droneRef = doc(db, "Drones", selectedDrone.droneId);
+
+      updateDoc(docRef, { status: "Active", droneId: selectedDrone.droneId })
+        .then((res) => {
+          console.log(res);
+          setShowMessage(1);
+        })
+        .catch((err) => {
+          setShowMessage(-1);
+          console.log(err);
+        });
+
+      updateDoc(droneRef, { status: "Active", order })
+        .then((res) => {
+          console.log(res);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      setShowMessage(-1);
+    }
   };
 
   const generateMessage = () => {
     if (showMessage === 0) return;
     let message = "Accepting order has been successfully created";
-    if (showMessage == -1)
-      message = "There was an error while accepting order request";
+    if (showMessage == -1) message = "There are no active drones available";
 
     return (
       <Snackbar
@@ -341,7 +349,7 @@ const Dashboard = () => {
                         <Button
                           variant="contained"
                           sx={{ background: "#41c4b9", marginBottom: "10px" }}
-                          onClick={() => acceptShipment(order.orderId)}
+                          onClick={() => acceptShipment(order)}
                         >
                           Accept
                         </Button>

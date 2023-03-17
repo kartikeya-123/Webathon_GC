@@ -8,7 +8,8 @@ import { UserAuth } from "../../context";
 import Signin from "../../components/Login";
 import TopBar from "../../components/TopBar";
 import Dashboard from "../../components/Dashboard";
-import Order from "../../components/order/order"import Drone from "../../components/Drones";
+import Order from "../../components/order/order";
+import Drone from "../../components/Drones";
 
 const Layout = () => {
   const { user } = UserAuth();

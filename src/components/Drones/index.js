@@ -231,7 +231,7 @@ const Drone = () => {
                         fontWeight: 550,
                       }}
                     >
-                      {row.orderId || ""}
+                      {(row.order && row.order.orderId.substr(0, 10)) || ""}
                     </TableCell>
                     <TableCell
                       align="left"
@@ -241,7 +241,7 @@ const Drone = () => {
                         fontWeight: 550,
                       }}
                     >
-                      {row.from || ""}
+                      {(row.order && row.order.fromAddress) || ""}
                     </TableCell>
                     <TableCell
                       align="left"
@@ -251,7 +251,7 @@ const Drone = () => {
                         fontWeight: 550,
                       }}
                     >
-                      {row.to || ""}
+                      {(row.order && row.order.toAddress) || ""}
                     </TableCell>
                   </TableRow>
                 ))}
