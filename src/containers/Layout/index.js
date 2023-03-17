@@ -3,6 +3,7 @@ import Sidebar from "./../../components/Sidebar";
 import { Container } from "@mui/material";
 import { Routes, Route } from "react-router-dom";
 import NewOrder from "../NewOrder";
+import Order from "./order"
 import { Box } from "@mui/material";
 const Layout = () => {
   return (
@@ -19,11 +20,13 @@ const Layout = () => {
       <div
         style={{
           flexGrow: 1,
-          background: "red",
+          marginLeft:"200px"
+         
         }}
       >
         <Routes>
-          <Route path="/profile" element={<NewOrder />} />
+          {/* <Route path="/profile" element={<NewOrder />} /> */}
+          <Route path="/orders" element={<Order />} />
         </Routes>
       </div>
     </div>
