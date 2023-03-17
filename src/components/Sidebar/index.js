@@ -13,11 +13,11 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import MailIcon from "@mui/icons-material/Mail";
-import { Hidden } from "@mui/material";
+import { Button, Hidden } from "@mui/material";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import logo from "./../../assests/images/logo.png";
 import { useNavigate } from "react-router-dom";
-
+import { UserAuth } from "../../context";
 const drawerWidth = 230;
 
 const options = [
@@ -38,7 +38,7 @@ const options = [
     route: "orders",
   },
   {
-    title: "Place-Order",
+    title: "New Order",
     icon: AssignmentIcon,
     route: "new-order",
   },
@@ -46,6 +46,7 @@ const options = [
 export default function PermanentDrawerLeft() {
   const [active, setActive] = useState("Home");
   const navigate = useNavigate();
+  const { logOut } = UserAuth();
 
   return (
     <Box>
@@ -120,6 +121,14 @@ export default function PermanentDrawerLeft() {
               );
             })}
           </List>
+          <Box sx={{ marginBottom: "40px", textAlign: "center" }}>
+            <Button
+              onClick={logOut}
+              sx={{ background: "#2C0FA3", color: "white" }}
+            >
+              Logout
+            </Button>
+          </Box>
         </Drawer>
       </Hidden>
     </Box>

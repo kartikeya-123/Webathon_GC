@@ -1,4 +1,5 @@
 import {
+  Alert,
   Box,
   Button,
   Card,
@@ -6,6 +7,7 @@ import {
   Container,
   FormControl,
   InputLabel,
+  Snackbar,
   TextField,
   Typography,
 } from "@mui/material";
@@ -19,7 +21,13 @@ import {
 import Geocode from "react-geocode";
 import Fab from "@mui/material/Fab";
 import AddIcon from "@mui/icons-material/Add";
-const NewOrder = () => {
+
+import { db } from "./../../config";
+import { collection, setDoc, doc, getDoc, updateDoc } from "firebase/firestore";
+import { v4 as uuidv4 } from "uuid";
+import { CheckCircleOutline } from "@mui/icons-material";
+
+const NewOrder = ({ user }) => {
   // Variables
   const [fromAddress, setFromAddress] = useState("");
   const [toAddress, setToAddress] = useState("");
@@ -32,6 +40,7 @@ const NewOrder = () => {
   const [active, setActive] = useState(0);
 
   const [show, setShow] = useState(true);
+  const [showMessage, setShowMessage] = useState(0);
 
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: "AIzaSyAm8wWzqS9Rltn5WvhUGqGZPeJsmJkykNU",
@@ -87,6 +96,14 @@ const NewOrder = () => {
     );
   };
 
+  const clearData = () => {
+    setFromAddress("");
+    setFromLatLong(null);
+    setToAddress("");
+    setToLatLong(null);
+    setItems(null);
+    setWeight(null);
+  };
   const handleChange = (value, type) => {
     console.log(value);
     if (type === "from") {
@@ -96,6 +113,60 @@ const NewOrder = () => {
       setToAddress(value);
       getLatLong(value, setToLatLong);
     }
+  };
+
+  const submit = async () => {
+    const data = {
+      from: fromLatLong,
+      to: toLatLong,
+      items: items,
+      weight: weight,
+      userId: user.uid,
+    };
+
+    // Firebase request to db
+    console.log(data);
+    const orderId = uuidv4();
+
+    const orderRef = doc(db, "Orders", orderId);
+    try {
+      const order = await setDoc(orderRef, data);
+
+      let orders = user.orders;
+      orders.push(orderId);
+
+      const userRef = doc(db, "Users", user.uid);
+      await updateDoc(userRef, {
+        orders: orders,
+      });
+
+      setShowMessage(1);
+      clearData();
+    } catch (err) {
+      setShowMessage(-1);
+      console.log(err);
+    }
+  };
+
+  const generateMessage = () => {
+    if (showMessage === 0) return;
+    let message = "Your order request has been successfully created";
+    if (showMessage == -1)
+      message = "There was an error while creating your order request";
+    return (
+      <Snackbar
+        open={true}
+        autoHideDuration={4000}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          severity={showMessage === 1 ? "success" : "error"}
+          sx={{ width: "100%", background: "#94e35b", fontWeight: 600 }}
+        >
+          {message}
+        </Alert>
+      </Snackbar>
+    );
   };
   return (
     <Box sx={{ width: "100%", height: "100vh" }}>
@@ -246,12 +317,14 @@ const NewOrder = () => {
                     Number(items) > 0
                   )
                 }
+                onClick={submit}
               >
                 Order
               </Button>
             </Box>
           </Card>
         )}
+        {generateMessage()}
         {!show && (
           <Fab color="primary" aria-label="add" onClick={() => setShow(true)}>
             <AddIcon />
