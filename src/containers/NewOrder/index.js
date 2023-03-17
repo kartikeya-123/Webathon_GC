@@ -118,10 +118,14 @@ const NewOrder = ({ user }) => {
   const submit = async () => {
     const data = {
       from: fromLatLong,
+      fromAddress: fromAddress,
       to: toLatLong,
+      toAddress: toAddress,
       items: items,
       weight: weight,
-      userId: user.uid,
+      userId: user.email,
+      status: "Pending",
+      progress: 0,
     };
 
     // Firebase request to db
@@ -135,7 +139,7 @@ const NewOrder = ({ user }) => {
       let orders = user.orders;
       orders.push(orderId);
 
-      const userRef = doc(db, "Users", user.uid);
+      const userRef = doc(db, "Users", user.email);
       await updateDoc(userRef, {
         orders: orders,
       });
@@ -153,11 +157,15 @@ const NewOrder = ({ user }) => {
     let message = "Your order request has been successfully created";
     if (showMessage == -1)
       message = "There was an error while creating your order request";
+
     return (
       <Snackbar
         open={true}
         autoHideDuration={4000}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        onClose={() => {
+          setShowMessage(0);
+        }}
       >
         <Alert
           severity={showMessage === 1 ? "success" : "error"}

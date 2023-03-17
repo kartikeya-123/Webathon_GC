@@ -7,6 +7,7 @@ import { Box } from "@mui/material";
 import { UserAuth } from "../../context";
 import Signin from "../../components/Login";
 import TopBar from "../../components/TopBar";
+import Dashboard from "../../components/Dashboard";
 
 const Layout = () => {
   const { user } = UserAuth();
@@ -46,6 +47,7 @@ const Layout = () => {
             >
               <Routes>
                 <Route path="/new-order" element={<NewOrder user={user} />} />
+                <Route path="/dashboard" element={<Dashboard user={user} />} />
               </Routes>
             </div>
           </div>
