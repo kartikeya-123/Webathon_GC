@@ -28,11 +28,6 @@ const options = [
   },
 
   {
-    title: "Profile",
-    icon: AssignmentIcon,
-    route: "profile",
-  },
-  {
     title: "Orders",
     icon: AssignmentIcon,
     route: "orders",
@@ -42,15 +37,16 @@ const options = [
     icon: AssignmentIcon,
     route: "new-order",
   },
-  {
-    title: "Track",
-    icon: AssignmentIcon,
-    route: "track",
-  },
+
   {
     title: "Dashboard",
     icon: AssignmentIcon,
     route: "dashboard",
+  },
+  {
+    title: "Drones",
+    icon: AssignmentIcon,
+    route: "drones",
   },
 ];
 export default function PermanentDrawerLeft() {
@@ -91,12 +87,13 @@ export default function PermanentDrawerLeft() {
               gap: "10px",
             }}
           >
-            {options.map((option) => {
+            {options.map((option, ind) => {
               let tabActive = false;
               if (active === option.title) tabActive = true;
 
               return (
                 <ListItemButton
+                  key={ind}
                   onClick={() => {
                     setActive(option.title);
                     navigate(option.route);

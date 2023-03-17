@@ -12,9 +12,9 @@ import {
   InfoWindow,
 } from "@react-google-maps/api";
 
-const TrackOrder = ({ setroute,setdata,setorderdelivered}) => {
+const TrackOrder = ({ setroute, setdata, setorderdelivered }) => {
   const origin = { lat: 6.5244, lng: 3.3792 };
- 
+
   const [Path, setpath] = useState(null);
   const destination = { lat: 6.4667, lng: 3.45 };
   const [dire, setd] = useState(null);
@@ -23,7 +23,11 @@ const TrackOrder = ({ setroute,setdata,setorderdelivered}) => {
   const [open, isopen] = useState(false);
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: "AIzaSyAm8wWzqS9Rltn5WvhUGqGZPeJsmJkykNU",
+
     libraries:["places"]
+
+ 
+
   });
 
   if (!isLoaded) {
@@ -39,7 +43,7 @@ const TrackOrder = ({ setroute,setdata,setorderdelivered}) => {
     var y = 0;
     const z = setInterval(() => {
       if (y >= x.length) {
-        setorderdelivered(true)
+        setorderdelivered(true);
         clearInterval(z);
         return;
       } else {
@@ -61,7 +65,12 @@ const TrackOrder = ({ setroute,setdata,setorderdelivered}) => {
       (result, status) => {
         if (status === window.google.maps.DirectionsStatus.OK) {
           setd(result);
-          setdata({distance:result.routes[0].legs[0].distance.text,time:result.routes[0].legs[0].duration.text,from:origin,to:destination})
+          setdata({
+            distance: result.routes[0].legs[0].distance.text,
+            time: result.routes[0].legs[0].duration.text,
+            from: origin,
+            to: destination,
+          });
           var z = result.routes[0].legs[0].steps;
 
           if (z.length > 5) {
@@ -78,11 +87,17 @@ const TrackOrder = ({ setroute,setdata,setorderdelivered}) => {
     );
   };
   return (
-    <div style={{width:"100%",display:"flex",flexDirection:"row",justifyContent:"center"}}>
+    <div
+      style={{
+        width: "100%",
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "center",
+      }}
+    >
       <GoogleMap
         onLoad={() => {
           get();
-          
         }}
         defaultCenter={{ lat: 6.5244, lng: 3.3792 }}
         zoom={10}

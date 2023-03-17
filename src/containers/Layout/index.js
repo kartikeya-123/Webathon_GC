@@ -8,7 +8,9 @@ import { UserAuth } from "../../context";
 import Signin from "../../components/Login";
 import TopBar from "../../components/TopBar";
 import Dashboard from "../../components/Dashboard";
-import Order from "../../components/order/order"
+import Order from "../../components/order/order";
+import Drone from "../../components/Drones";
+
 const Layout = () => {
   const { user } = UserAuth();
 
@@ -48,6 +50,7 @@ const Layout = () => {
               <Routes>
                 <Route path="/new-order" element={<NewOrder user={user} />} />
                 <Route path="/dashboard" element={<Dashboard user={user} />} />
+                <Route path="/drones" element={<Drone user={user} />} />
                 <Route path="/orders" element={<Order user={user} />} />
               </Routes>
             </div>
