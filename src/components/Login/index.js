@@ -1,7 +1,10 @@
 import React, { useEffect } from "react";
-import { GoogleButton } from "react-google-button";
 import { UserAuth } from "../../context/index";
 import { useNavigate } from "react-router-dom";
+import Login from "./SaaSProductLandingPage"
+import GlobalStyles from "./styles/styles/GlobalStyles";
+import { GoogleAuthProvider } from "firebase/auth";
+import { css } from 'styled-components/macro'; //eslint-disable-line
 
 const Signin = () => {
   const { googleSignIn, user } = UserAuth();
@@ -22,12 +25,12 @@ const Signin = () => {
   }, [user]);
 
   return (
-    <div>
-      <h1 className="text-center text-3xl font-bold py-8">Sign in</h1>
-      <div className="max-w-[240px] m-auto py-4">
-        <GoogleButton onClick={handleGoogleSignIn} />
-      </div>
-    </div>
+   <>
+     <GlobalStyles></GlobalStyles>
+      
+        <Login handleGoogleSignIn={handleGoogleSignIn}></Login>
+        </>
+   
   );
 };
 
