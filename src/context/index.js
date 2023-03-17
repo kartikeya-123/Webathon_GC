@@ -22,7 +22,7 @@ export const AuthContextProvider = ({ children }) => {
       orders: [],
     };
     console.log(postData);
-    const docRef = doc(db, "Users", userData.uid);
+    const docRef = doc(db, "Users", userData.email);
     const data = await setDoc(docRef, postData);
 
     if (!data) {
@@ -31,7 +31,7 @@ export const AuthContextProvider = ({ children }) => {
   };
 
   const getUser = async (userData) => {
-    const docRef = doc(db, "Users", userData.uid);
+    const docRef = doc(db, "Users", userData.email);
     const dataSnap = await getDoc(docRef);
     if (dataSnap.exists()) {
       const userData = dataSnap.data();

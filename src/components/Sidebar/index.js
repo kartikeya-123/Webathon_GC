@@ -42,6 +42,11 @@ const options = [
     icon: AssignmentIcon,
     route: "new-order",
   },
+  {
+    title: "Track",
+    icon: AssignmentIcon,
+    route: "track",
+  },
 ];
 export default function PermanentDrawerLeft() {
   const [active, setActive] = useState("Home");
