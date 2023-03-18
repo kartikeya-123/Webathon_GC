@@ -280,7 +280,7 @@ const Dashboard = () => {
 
       <Box style={{ height: "300px", width: "100%", justifyContent: "center" }}>
         <GoogleMap
-          defaultCenter={center}
+          center={center}
           zoom={10}
           mapContainerStyle={{ width: "100%", height: "100%" }}
           options={{
