@@ -278,15 +278,11 @@ const Dashboard = () => {
         Dashboard
       </Typography> */}
 
-      <Box sx={{ height: "340px", borderRadius: "40px" }}>
+      <Box style={{ height: "300px", width: "100%", justifyContent: "center" }}>
         <GoogleMap
           defaultCenter={center}
           zoom={10}
-          mapContainerStyle={{
-            width: "100%",
-            height: "100%",
-            borderRadius: "10px",
-          }}
+          mapContainerStyle={{ width: "100%", height: "100%" }}
           options={{
             streetViewControl: false,
             zoomControl: false,

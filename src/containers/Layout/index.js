@@ -29,7 +29,7 @@ const Layout = () => {
     >
       {user && (
         <>
-          <Sidebar />
+          <Sidebar user={user} />
 
           <div
             style={{

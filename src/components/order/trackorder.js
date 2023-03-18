@@ -41,11 +41,7 @@ const TrackOrder = ({
 
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: "AIzaSyAm8wWzqS9Rltn5WvhUGqGZPeJsmJkykNU",
-
-    libraries:["places"]
-
- 
-
+    libraries: ["places"],
   });
 
   const Move = (g) => {

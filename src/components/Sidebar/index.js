@@ -25,31 +25,36 @@ const options = [
     title: "Home",
     icon: AssignmentIcon,
     route: "",
+    adming: true,
   },
 
   {
     title: "Orders",
     icon: AssignmentIcon,
     route: "orders",
+    admin: false,
   },
   {
     title: "New Order",
     icon: AssignmentIcon,
     route: "new-order",
+    admin: false,
   },
 
   {
     title: "Dashboard",
     icon: AssignmentIcon,
     route: "dashboard",
+    admin: true,
   },
   {
     title: "Drones",
     icon: AssignmentIcon,
     route: "drones",
+    admin: true,
   },
 ];
-export default function PermanentDrawerLeft() {
+export default function PermanentDrawerLeft({ user }) {
   const [active, setActive] = useState("Home");
   const navigate = useNavigate();
   const { logOut } = UserAuth();
@@ -88,6 +93,9 @@ export default function PermanentDrawerLeft() {
             }}
           >
             {options.map((option, ind) => {
+              if (user.role === "admin" && option.admin === false) return;
+              else if (user.role === "user" && option.admin) return;
+
               let tabActive = false;
               if (active === option.title) tabActive = true;
 

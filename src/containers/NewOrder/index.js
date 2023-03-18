@@ -48,11 +48,11 @@ const NewOrder = ({ user }) => {
 
   Geocode.setApiKey("AIzaSyAm8wWzqS9Rltn5WvhUGqGZPeJsmJkykNU");
   Geocode.setLanguage("en");
-  
+
   if (!isLoaded) {
     return <div>Loading</div>;
   }
-  
+
   const center = { lat: 20.1469136, lng: 85.6727937 };
 
   const userSelect = (res) => {
@@ -176,171 +176,172 @@ const NewOrder = ({ user }) => {
     );
   };
   return (
-<>
-  <Box sx={{ width: "100%", height: "100%" }}>
+    <>
       <Box sx={{ width: "100%", height: "100%" }}>
-        <GoogleMap
-          center={center}
-          zoom={10}
-          mapContainerStyle={{ width: "100%", height: "100%" }}
-          options={{
-            streetViewControl: false,
-            zoomControl: false,
-          }}
-          onClick={userSelect}
-        >
-          {fromLatLong && <Marker position={fromLatLong} label="Source" />}
-          {toLatLong && <Marker position={toLatLong} label="Destination" />}
-        </GoogleMap>
-      </Box>
-      <Box sx={{ position: "absolute", bottom: "40px", right: "20px" }}>
-        {show && (
-          <Card
-            raised={true}
-            sx={{
-              width: 500,
-              background: "#F4F5FA ",
-              borderRadius: "20px",
-              paddingBottom: "20px  ",
-              // display: "flex",
-              // justifyContent: "center",
-              // alignItems: "center",
+        <Box sx={{ width: "100%", height: "100%" }}>
+          <GoogleMap
+            center={center}
+            zoom={10}
+            mapContainerStyle={{ width: "100%", height: "100%" }}
+            options={{
+              streetViewControl: false,
+              zoomControl: false,
             }}
+            onClick={userSelect}
           >
-            <Box sx={{ position: "absolute", right: "0px", top: "10px" }}>
-              <Button
-                sx={{ padding: "0px", margin: "0px" }}
-                onClick={() => setShow(false)}
-              >
-                X
-              </Button>
-            </Box>
-            <Box>
-              <Typography
-                sx={{
-                  fontSize: 24,
-                  fontWeight: 600,
-                  textAlign: "center",
-                  marginTop: "10px",
-                }}
-              >
-                Details
-              </Typography>
-            </Box>
-            <Box
+            {fromLatLong && <Marker position={fromLatLong} label="Source" />}
+            {toLatLong && <Marker position={toLatLong} label="Destination" />}
+          </GoogleMap>
+        </Box>
+        <Box sx={{ position: "absolute", bottom: "40px", right: "20px" }}>
+          {show && (
+            <Card
+              raised={true}
               sx={{
-                display: "flex",
-                justifyContent: "center",
-                gap: "20px ",
-                marginTop: "20px",
+                width: 500,
+                background: "#F4F5FA ",
+                borderRadius: "20px",
+                paddingBottom: "20px  ",
+                // display: "flex",
+                // justifyContent: "center",
+                // alignItems: "center",
               }}
             >
-              <Box>
-                <InputLabel sx={{ fontWeight: 600 }}>From</InputLabel>
-                <Autocomplete>
-                  <TextField
-                    id="outlined-basic"
-                    variant="outlined"
-                    sx={{ width: "220px" }}
-                    value={fromAddress}
-                    onChange={(event) =>
-                      handleChange(event.target.value, "from")
-                    }
-                    focused={active == 0}
-                    onClick={() => setActive(0)}
-                  />
-                </Autocomplete>
+              <Box sx={{ position: "absolute", right: "0px", top: "10px" }}>
+                <Button
+                  sx={{ padding: "0px", margin: "0px" }}
+                  onClick={() => setShow(false)}
+                >
+                  X
+                </Button>
               </Box>
               <Box>
-                <InputLabel sx={{ fontWeight: 600 }}>To</InputLabel>
-                <Autocomplete
-                  onClick={(event) => {
-                    console.log(event);
+                <Typography
+                  sx={{
+                    fontSize: 24,
+                    fontWeight: 600,
+                    textAlign: "center",
+                    marginTop: "10px",
                   }}
                 >
+                  Details
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  gap: "20px ",
+                  marginTop: "20px",
+                }}
+              >
+                <Box>
+                  <InputLabel sx={{ fontWeight: 600 }}>From</InputLabel>
+                  <Autocomplete>
+                    <TextField
+                      id="outlined-basic"
+                      variant="outlined"
+                      sx={{ width: "220px" }}
+                      value={fromAddress}
+                      onChange={(event) =>
+                        handleChange(event.target.value, "from")
+                      }
+                      focused={active == 0}
+                      onClick={() => setActive(0)}
+                    />
+                  </Autocomplete>
+                </Box>
+                <Box>
+                  <InputLabel sx={{ fontWeight: 600 }}>To</InputLabel>
+                  <Autocomplete
+                    onClick={(event) => {
+                      console.log(event);
+                    }}
+                  >
+                    <TextField
+                      id="outlined-basic"
+                      variant="outlined"
+                      sx={{ width: "220px" }}
+                      value={toAddress}
+                      onChange={(event) =>
+                        handleChange(event.target.value, "to")
+                      }
+                      focused={active == 1}
+                      onClick={() => setActive(1)}
+                    />
+                  </Autocomplete>
+                </Box>
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  gap: "20px ",
+                  marginTop: "20px",
+                }}
+              >
+                <Box>
+                  <InputLabel sx={{ fontWeight: 600 }}>Items</InputLabel>
                   <TextField
                     id="outlined-basic"
                     variant="outlined"
                     sx={{ width: "220px" }}
-                    value={toAddress}
-                    onChange={(event) => handleChange(event.target.value, "to")}
-                    focused={active == 1}
-                    onClick={() => setActive(1)}
+                    value={items}
+                    onChange={(event) => setItems(event.target.value)}
+                    onClick={() => setActive(2)}
                   />
-                </Autocomplete>
-              </Box>
-            </Box>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                gap: "20px ",
-                marginTop: "20px",
-              }}
-            >
-              <Box>
-                <InputLabel sx={{ fontWeight: 600 }}>Items</InputLabel>
-                <TextField
-                  id="outlined-basic"
-                  variant="outlined"
-                  sx={{ width: "220px" }}
-                  value={items}
-                  onChange={(event) => setItems(event.target.value)}
-                  onClick={() => setActive(2)}
-                />
-              </Box>
-              <Box>
-                <InputLabel sx={{ fontWeight: 600 }}>Weight</InputLabel>
+                </Box>
+                <Box>
+                  <InputLabel sx={{ fontWeight: 600 }}>Weight</InputLabel>
 
-                <TextField
-                  id="outlined-basic"
-                  variant="outlined"
-                  sx={{ width: "220px" }}
-                  value={weight}
-                  onChange={(event) => setWeight(event.target.value)}
-                  onClick={() => setActive(3)}
-                />
+                  <TextField
+                    id="outlined-basic"
+                    variant="outlined"
+                    sx={{ width: "220px" }}
+                    value={weight}
+                    onChange={(event) => setWeight(event.target.value)}
+                    onClick={() => setActive(3)}
+                  />
+                </Box>
               </Box>
-            </Box>
-            <Box sx={{ textAlign: "center", marginTop: "20px" }}>
-              <Button
-                sx={{
-                  background: "#1abda2",
-                  borderRadius: "20px",
-                  padding: "5px 20px",
-                  color: "white",
-                  "&:hover": {
-                    background: "#1db9db",
-                  },
-                  "&:disabled": {
-                    background: "#74d3e8",
+              <Box sx={{ textAlign: "center", marginTop: "20px" }}>
+                <Button
+                  sx={{
+                    background: "#1abda2",
+                    borderRadius: "20px",
+                    padding: "5px 20px",
                     color: "white",
-                  },
-                }}
-                disabled={
-                  !(
-                    fromLatLong &&
-                    toLatLong &&
-                    Number(weight) > 0 &&
-                    Number(items) > 0
-                  )
-                }
-                onClick={submit}
-              >
-                Order
-              </Button>
-            </Box>
-          </Card>
-        )}
-        {generateMessage()}
-        {!show && (
-          <Fab color="primary" aria-label="add" onClick={() => setShow(true)}>
-            <AddIcon />
-          </Fab>
-        )}
+                    "&:hover": {
+                      background: "#1db9db",
+                    },
+                    "&:disabled": {
+                      background: "#74d3e8",
+                      color: "white",
+                    },
+                  }}
+                  disabled={
+                    !(
+                      fromLatLong &&
+                      toLatLong &&
+                      Number(weight) > 0 &&
+                      Number(items) > 0
+                    )
+                  }
+                  onClick={submit}
+                >
+                  Order
+                </Button>
+              </Box>
+            </Card>
+          )}
+          {generateMessage()}
+          {!show && (
+            <Fab color="primary" aria-label="add" onClick={() => setShow(true)}>
+              <AddIcon />
+            </Fab>
+          )}
+        </Box>
       </Box>
-    </Box>
-
     </>
   );
 };
